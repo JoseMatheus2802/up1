@@ -12,8 +12,7 @@ jump_size = fields_table["jump"]
 try:
     filename = sys.argv[1]
 except:
-    print 'Error: no argument given!\n'\
-          'Usage: ./assembler.py program.asm'
+    print ('Error: no argument given!\n Usage: ./assembler.py program.asm')
     sys.exit(1) 
 
 def main():
@@ -41,14 +40,14 @@ def translate(a):
             f.append(atable[i])
             code += 1
     if code > space_table["code"]:
-        print "Error: out of code memory!"
+        print ("Error: out of code memory!")
         sys.exit(2)
     elif code < space_table["code"]:
         for i in range(space_table["code"] - code):
             f.append(to_b(0, 8))
     video = len(vtable)
     if video > space_table["video"]:
-        print "Warning: video data truncated", video
+        print ("Warning: video data truncated"), video
         vtable = vtable[0:space_table["video"]] 
     for i in vtable:
         if is_hex(i):
@@ -58,16 +57,16 @@ def translate(a):
     if video < space_table["video"]:
         for i in range(space_table["video"] - video):
             f.append(to_b(63, 8)) # white fill
-    print "Video:", len(vtable), "/", space_table["video"] 
+    print ("Video:", len(vtable), "/", space_table["video"])
     for i in range(space_table["unused"]):
         f.append(to_b(255, 8))
-    print "Unused:", space_table["unused"]
-    data = [to_b(0, 8) for i in xrange(space_table["data"])]
+    print ("Unused:", space_table["unused"])
+    data = [to_b(0, 8) for i in range(space_table["data"])]
     for i in dtable:
         data[try_parse_int(dtable[i][0], base=2)] = dtable[i][1]
     for i in data:
         f.append(i) 
-    print "Code:", code, "/", space_table["code"] 
+    print ("Code:", code, "/", space_table["code"])
     return f    
         
 def make_ltable(a):
@@ -77,7 +76,7 @@ def make_ltable(a):
         if is_l_command(i): #find a label, add line number to it
             x -= 1
             ltable[i[0:-1]] = to_b(x, jump_size) #use binary helper with 0's padding
-            print "Label:", i[0:-1], "address", x
+            print ("Label:", i[0:1], "address", x)
 
 def make_dtable(a):
     global vtable
@@ -86,27 +85,27 @@ def make_dtable(a):
         if is_d_command(i): 
             var = i.split(' ')[0][1:]
             if len(i.split(' ')) < 2:
-                print "Error: missing value for variable '" + var + "'!"
+                print ("Error: missing value for variable '" + var + "'!")
                 sys.exit(8)
             else:
                 val = i.split(' ')[1] 
                 if var in dtable.keys():
-                    print "Error: redefinition of variable '" + var + "'!"
+                    print ("Error: redefinition of variable '" + var + "'!")
                     sys.exit(7)
                 elif var == "video":
-                    print "Video data declaration"
+                    print ("Video data declaration")
                     vtable = val.split(",") 
                 elif try_parse_int(val) is not None:
                     dtable[var] = [to_b(space, address_size), to_b(int(val))]      
                     space += 1
-                    print "Data declaration", var
+                    print ("Data declaration", var)
                 else:
                     dtable[var] = [to_b(space, address_size),  to_b(0)] # unable to parse
                     space += 1
         if space > space_table["data"]:
-            print "Error: out of data memory!"           	
+            print ("Error: out of data memory!")           	
             sys.exit(3)
-    print "Data:", space, "/", space_table["data"]
+    print ("Data:", space, "/", space_table["data"])
 
 def make_atable(a):
     for i in a:
@@ -122,17 +121,17 @@ def make_atable(a):
                     if param in ltable:
                         param = ltable[param]
                     else:
-                        print "Error: undefined label '" + param + "'!"
+                        print ("Error: undefined label '" + param + "'!")
                         sys.exit(4)
                 else:
                     if param in dtable:
                         param = dtable[param][0]
                     else:
-                        print "Error: undefined variable '" + param + "'!"
+                        print ("Error: undefined variable '" + param + "'!")
                         sys.exit(5)
                 atable[i] = inst_table[mnemo] + param
             else:
-                print "Error: unknown instruction '" + mnemo + "'!"
+                print ("Error: unknown instruction '" + mnemo + "'!")
                 sys.exit(6)
 
 def write_file(a):
@@ -146,5 +145,4 @@ def write_file(a):
 if __name__ == "__main__":
     t0 = time.time()
     main()
-    print "Time: ", time.time()-t0, "s"
-
+    print ("Time: ", time.time()-t0, "s")
