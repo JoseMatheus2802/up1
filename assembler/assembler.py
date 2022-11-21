@@ -13,7 +13,7 @@ try:
     filename = sys.argv[1]
 except:
     print ('Error: no argument given!\n Usage: ./assembler.py program.asm')
-    sys.exit(1) 
+    sys.exit(1)
 
 def main():
     a = prepare_file(filename)
@@ -28,7 +28,7 @@ def prepare_file(filename):
     a = file.readlines()
     a = map(filter_line, a) #map remove comments    
     a = [ i.strip() for i in [ x for x in a ] ] #remove white space
-    a = filter(lambda x : x != '', a) #remove empty elements    
+    a = list(filter(lambda x : x != '', a)) #remove empty elements    
     return a
 
 def translate(a):
